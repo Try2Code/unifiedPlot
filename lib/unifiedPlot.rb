@@ -68,4 +68,41 @@ module UnifiedPlot
       end
     end
   end
+  def UnifiedPlot.heatMap(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new( gp ) do |plot|
+        unless 'x11' == oType
+          plot.terminal oType
+          plot.output "#{oName}.#{oType}"
+        end
+
+        plotConf = PLOT_DEFAULTS.merge(plotConf)
+        plot.title   title
+        plot.key     plotConf[:label_position]
+
+        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
+        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
+        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
+        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+
+        plot.xtics
+        plot.ytics
+
+        plot.xlabel  plotConf[:xlabel]
+        plot.x2label plotConf[:x2label]
+        plot.ylabel  plotConf[:ylabel]
+        plot.y2label plotConf[:y2label]
+        inputs.each {|data|
+          data = DATA_DEFAULTS.merge(data)
+          dataset = [data[:x].to_a,data[:y].to_a,data[:z].to_a]
+          plot.data << Gnuplot::DataSet.new( dataset ) do |ds|
+            ds.with  = 'image'
+            ds.axes  = data[:axes]
+            ds.title = data[:title]
+          end
+        }
+        plot.grid
+      end
+    end
+  end
 end

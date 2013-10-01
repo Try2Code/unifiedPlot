@@ -98,8 +98,6 @@ class TestPlotter < Minitest::Test
     UnifiedPlot.linePlot(data,plotConf: plotConf)
   end
   def test_multi_plot_with_label_pos
-    x = (0...10).to_a.map(&:to_f)
-    y = [1,2,3,4,5,4,3,2,4,0].map(&:to_f)
     data = [{
       :x => @data[:x],
       :y => @data[:y],
@@ -114,5 +112,10 @@ class TestPlotter < Minitest::Test
     UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out right bottom'})
     UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out center bottom'})
     UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out center bottom horizontal'})
+  end
+  def test_heat_map
+    @data[:y] = @data[:x]
+    @data[:z] = mathOp(:sin,@data[:x])
+    UnifiedPlot.linePlot([@data])
   end
 end
