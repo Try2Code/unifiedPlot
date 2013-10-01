@@ -2,40 +2,69 @@ require 'gnuplot'
 
 module UnifiedPlot
 
+  PLOT_DEFAULTS = {
+    :grid    => true,
+    :ylabel  => nil,
+    :y2label => nil,
+    :xlabel  => nil,
+    :x2label => nil,
+    :label_position => 'bottom out',
+  }
+  DATA_DEFAULTS = {
+    :title   => '',
+    :style   => 'linespoints',
+    :axes    => 'x1y1',
+  }
   #
-  # input: data = {
-  #   :x => [...],     (optional)
+  # input elements: data = {
   #   :y => [...],     (required)
+  #   :x => [...],     (optional)
   #   :axes => 'x2y1', (optional)
   #   :title => '...',
   #   :style => 'lines',
   # }
-  def UnifiedPlot.linePlot(data, oType='x11',oName='test')
+  #        plot = {
+  #   :xlabel => '',
+  #   :ylabel => '',
+  #   :title  => '',
+  #   :grid   => false.
+  # }
+  def UnifiedPlot.linePlot(inputs, plotConf: PLOT_DEFAULTS, title: '', oType: 'x11',oName: 'test')
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
         unless 'x11' == oType
           plot.terminal oType
           plot.output "#{oName}.#{oType}"
         end
-        if ENV['TITLE'].nil?
-          plot.title 'vertDiff'
-        else
-          plot.title ENV['TITLE']
-        end
-        plot.grid
 
-        plot.yrange  "[0:#{ENV['YMAX']}]"  unless ENV['YMAX'].nil?
-        plot.y2range "[0:#{ENV['Y2MAX']}]" unless ENV['Y2MAX'].nil?
+        plotConf = PLOT_DEFAULTS.merge(plotConf)
+        plot.title   title
+        plot.key     plotConf[:label_position]
 
-        plot.y2tics  'in'
-        plot.key     'out horiz bot'
-        plot.ylabel  'Temperture'
-        plot.y2label 'Temperture'
-        data.each {|v|
-          plot.data << Gnuplot::DataSet.new( v ) do |ds|
-            ds.with = "lines"
+        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
+        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
+        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
+        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+
+        plot.xtics
+        plot.ytics
+
+        plot.xlabel  plotConf[:xlabel]
+        plot.x2label plotConf[:x2label]
+        plot.ylabel  plotConf[:ylabel]
+        plot.y2label plotConf[:y2label]
+        inputs.each {|data|
+          data = DATA_DEFAULTS.merge(data)
+          dataset = data.has_key?(:x) ? [data[:x].to_a,data[:y].to_a] : data[:y].to_a
+          plot.data << Gnuplot::DataSet.new( dataset ) do |ds|
+            ds.with  = data[:style]
+            ds.axes  = data[:axes]
+            plot.x2tics  'in' if data[:axes][0,2] == 'x2'
+            plot.y2tics  'in' if data[:axes][-2..-1] == 'y2'
+            ds.title = data[:title]
           end
         }
+        plot.grid
       end
     end
   end
