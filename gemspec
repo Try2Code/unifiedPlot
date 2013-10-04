@@ -2,7 +2,7 @@ require 'rubygems'
 
 GEM_SPEC = Gem::Specification.new do |s|
   s.name              = "unifiedPlot"
-  s.version           = '0.0.1'
+  s.version           = '0.0.2rc1'
   s.date              = Time.new.strftime("%Y-%m-%d")
 
   s.description       = 'single interface to line-plotting data in [],NArray and GSL::Vector format'

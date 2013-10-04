@@ -30,6 +30,9 @@ module UnifiedPlot
   #   :grid   => false.
   # }
   def UnifiedPlot.linePlot(inputs, plotConf: PLOT_DEFAULTS, title: '', oType: 'x11',oName: 'test')
+    # allow hash input
+    inputs = [inputs] if inputs.kind_of? Hash
+
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
         unless 'x11' == oType
