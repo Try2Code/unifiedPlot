@@ -1,4 +1,5 @@
 require 'gnuplot'
+require 'rubypython'
 
 module UnifiedPlot
 
@@ -107,5 +108,11 @@ module UnifiedPlot
         plot.grid
       end
     end
+  end
+  def UnifiedPlot.fieldPlot(inputs)
+    RubyPython.start
+    pl = RubyPython.import('pylab')
+    pl.imshow(inputs.to_a.reverse)
+    pl.show()
   end
 end

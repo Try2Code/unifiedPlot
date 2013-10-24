@@ -3,6 +3,7 @@ require 'minitest/autorun'
 require "unifiedPlot"
 require 'narray'
 require 'gsl'
+require 'cdo'
 require 'pp'
 
 class TestPlotter < Minitest::Test
@@ -35,7 +36,6 @@ class TestPlotter < Minitest::Test
         :y => GSL::Vector[*y],
       }
     end
-    pp @data
   end
   def mathOp(op,input)
     case @inputType
@@ -117,5 +117,12 @@ class TestPlotter < Minitest::Test
     @data[:y] = @data[:x]
     @data[:z] = mathOp(:sin,@data[:x])
     UnifiedPlot.linePlot([@data])
+  end
+
+  def test_field_plot
+    Cdo.debug = true
+    topo      = Cdo.topo(options: '-f nc',returnMaArray: 'topo')
+    topoOcean = Cdo.setrtomiss(0,100000,input: "-topo", options: '-f nc',returnMaArray: 'topo')
+    UnifiedPlot.fieldPlot(topo)
   end
 end
