@@ -10,6 +10,10 @@ module UnifiedPlot
     :xlabel  => nil,
     :x2label => nil,
     :label_position => 'bottom out',
+    :xsize => 1200,
+    :ysize => 800,
+    :font => 'arial',
+    :fontsize => 10,
   }
   DATA_DEFAULTS = {
     :title   => '',
@@ -28,16 +32,18 @@ module UnifiedPlot
   #   :xlabel => '',
   #   :ylabel => '',
   #   :title  => '',
-  #   :grid   => false.
+  #   :grid   => false,
   # }
   def UnifiedPlot.linePlot(inputs, plotConf: PLOT_DEFAULTS, title: '', oType: 'x11',oName: 'test')
     # allow hash input
     inputs = [inputs] if inputs.kind_of? Hash
 
+    plotConf = PLOT_DEFAULTS.merge(plotConf) unless plotConf == PLOT_DEFAULTS 
+
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
         unless 'x11' == oType
-          plot.terminal oType
+          plot.terminal "#{oType} size #{plotConf[:xsize]},#{plotConf[:ysize]} font #{plotConf[:font]} #{plotConf[:fontsize]}"
           plot.output "#{oName}.#{oType}"
         end
 

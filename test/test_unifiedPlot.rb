@@ -47,6 +47,9 @@ class TestPlotter < Minitest::Test
       input.map {|v| Math.send(op,v)}
     end
   end
+  def showImage(file)
+    system("sxiv #{file}")
+  end
   def test_single_plot
     UnifiedPlot.linePlot([@data])
   end
@@ -96,6 +99,9 @@ class TestPlotter < Minitest::Test
     }]
     plotConf = {:y2label => 'y2label',:x2label => 'x2label'}
     UnifiedPlot.linePlot(data,plotConf: plotConf)
+    oName = 'test_test_multi_plot_with_labels'
+    UnifiedPlot.linePlot(data,plotConf: plotConf,oType: 'png',oName: oName)
+    showImage("#{oName}.png")
   end
   def test_multi_plot_with_label_pos
     data = [{
