@@ -1,5 +1,6 @@
 require 'gnuplot'
 require 'rubypython'
+require 'fileutils'
 
 module UnifiedPlot
 
@@ -75,6 +76,48 @@ module UnifiedPlot
           end
         }
         plot.grid
+      end
+    end
+  end
+  def UnifiedPlot.pm3d(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+    Gnuplot.open do |gp|
+      Gnuplot::SPlot.new( gp ) do |plot|
+        unless 'x11' == oType
+          plot.terminal oType
+          plot.output "#{oName}.#{oType}"
+        end
+
+        plotConf = PLOT_DEFAULTS.merge(plotConf)
+        plot.title   title
+        plot.key     plotConf[:label_position]
+
+        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
+        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
+        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
+        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+
+        plot.xtics
+        plot.ytics
+
+        plot.xlabel  plotConf[:xlabel]
+        plot.x2label plotConf[:x2label]
+        plot.ylabel  plotConf[:ylabel]
+        plot.y2label plotConf[:y2label]
+
+        # write stuff to a file
+        filename = `tempfile`.chomp
+        File.open(filename,'w') {|f|
+          inputs.each {|data|
+            f << data.join(' ')
+            f << "\n"
+          }
+        }
+        
+        plot.view "map"
+        plot.data << Gnuplot::DataSet.new("'"+filename+"'") do |ds|
+          ds.with = "image"
+          ds.matrix = true
+        end
       end
     end
   end

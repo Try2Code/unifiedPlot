@@ -122,7 +122,16 @@ class TestPlotter < Minitest::Test
   def test_heat_map
     @data[:y] = @data[:x]
     @data[:z] = mathOp(:sin,@data[:x])
-    UnifiedPlot.linePlot([@data])
+    inputs = []
+    
+    10.times {
+      inputs << (rand*@data[:z] + rand + rand).to_a
+    }
+
+    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'})
+  end
+  def test_pm3d
+    pp @data
   end
 
   def test_field_plot
