@@ -35,35 +35,37 @@ module UnifiedPlot
   #   :title  => '',
   #   :grid   => false,
   # }
+  def UnifiedPlot.setPlotDefaults(plot,plotConf,title,oType,oName)
+    plotConf = PLOT_DEFAULTS.merge(plotConf)
+    unless 'x11' == oType
+      plot.terminal "#{oType} size #{plotConf[:xsize]},#{plotConf[:ysize]} font #{plotConf[:font]} #{plotConf[:fontsize]}"
+      plot.output "#{oName}.#{oType}"
+    end
+    plot.title   title
+    plot.key     plotConf[:label_position]
+
+    plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
+    plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
+    plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
+    plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+
+    plot.xtics
+    plot.ytics
+
+    plot.xlabel  plotConf[:xlabel]
+    plot.x2label plotConf[:x2label]
+    plot.ylabel  plotConf[:ylabel]
+    plot.y2label plotConf[:y2label]
+  end
+
   def UnifiedPlot.linePlot(inputs, plotConf: PLOT_DEFAULTS, title: '', oType: 'x11',oName: 'test')
     # allow hash input
     inputs = [inputs] if inputs.kind_of? Hash
 
-    plotConf = PLOT_DEFAULTS.merge(plotConf) unless plotConf == PLOT_DEFAULTS 
-
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
-        unless 'x11' == oType
-          plot.terminal "#{oType} size #{plotConf[:xsize]},#{plotConf[:ysize]} font #{plotConf[:font]} #{plotConf[:fontsize]}"
-          plot.output "#{oName}.#{oType}"
-        end
+        setPlotDefaults(plot,plotConf,title,oType,oName)
 
-        plotConf = PLOT_DEFAULTS.merge(plotConf)
-        plot.title   title
-        plot.key     plotConf[:label_position]
-
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
-
-        plot.xtics
-        plot.ytics
-
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
         inputs.each {|data|
           data = DATA_DEFAULTS.merge(data)
           dataset = data.has_key?(:x) ? [data[:x].to_a,data[:y].to_a] : data[:y].to_a
@@ -80,32 +82,18 @@ module UnifiedPlot
     end
   end
   def UnifiedPlot.pm3d(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+    # allow hash input
+    inputs = [inputs] if inputs.kind_of? Hash
+
+    # tempfile for holding the data (ugly, but works)
+    filename = `tempfile`.chomp
     Gnuplot.open do |gp|
       Gnuplot::SPlot.new( gp ) do |plot|
-        unless 'x11' == oType
-          plot.terminal oType
-          plot.output "#{oName}.#{oType}"
-        end
+        setPlotDefaults(plot,plotConf,title,oType,oName)
 
-        plotConf = PLOT_DEFAULTS.merge(plotConf)
-        plot.title   title
-        plot.key     plotConf[:label_position]
 
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
-
-        plot.xtics
-        plot.ytics
-
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
-
+        plot.nokey
         # write stuff to a file
-        filename = `tempfile`.chomp
         File.open(filename,'w') {|f|
           inputs.each {|data|
             f << data.join(' ')
@@ -115,48 +103,12 @@ module UnifiedPlot
 
         plot.view "map"
         plot.data << Gnuplot::DataSet.new("'"+filename+"'") do |ds|
-          ds.with = "image"
+          ds.with   = "image"
           ds.matrix = true
         end
       end
     end
-  end
-  def UnifiedPlot.heatMap(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
-    Gnuplot.open do |gp|
-      Gnuplot::Plot.new( gp ) do |plot|
-        unless 'x11' == oType
-          plot.terminal oType
-          plot.output "#{oName}.#{oType}"
-        end
-
-        plotConf = PLOT_DEFAULTS.merge(plotConf)
-        plot.title   title
-        plot.key     plotConf[:label_position]
-
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
-
-        plot.xtics
-        plot.ytics
-
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
-        inputs.each {|data|
-          data = DATA_DEFAULTS.merge(data)
-          dataset = [data[:x].to_a,data[:y].to_a,data[:z].to_a]
-          plot.data << Gnuplot::DataSet.new( dataset ) do |ds|
-            ds.with  = 'image'
-            ds.axes  = data[:axes]
-            ds.title = data[:title]
-          end
-        }
-        plot.grid
-      end
-    end
+    FileUtils.rm(filename)
   end
   def UnifiedPlot.fieldPlot(inputs)
     RubyPython.start

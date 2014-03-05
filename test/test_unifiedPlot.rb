@@ -124,11 +124,12 @@ class TestPlotter < Minitest::Test
     @data[:z] = mathOp(:sin,@data[:x])
     inputs = []
 
-    10.times {
-      inputs << (rand*@data[:z] + rand + rand).to_a
-    }
+    10.times { inputs << (rand*@data[:z] + rand + rand).to_a }
 
-    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'})
+    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map')
+    oName='test_heat_map'
+    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map',oType: 'png',oName: oName)
+    showImage("#{oName}.png")
   end
 
   def test_field_plot
