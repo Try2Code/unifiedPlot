@@ -112,7 +112,7 @@ module UnifiedPlot
             f << "\n"
           }
         }
-        
+
         plot.view "map"
         plot.data << Gnuplot::DataSet.new("'"+filename+"'") do |ds|
           ds.with = "image"
