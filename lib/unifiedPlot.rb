@@ -78,6 +78,7 @@ module UnifiedPlot
         plot.grid
       end
     end
+    return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.pm3d(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
     Gnuplot.open do |gp|
@@ -120,6 +121,7 @@ module UnifiedPlot
         end
       end
     end
+    return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.heatMap(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
     Gnuplot.open do |gp|
@@ -157,6 +159,7 @@ module UnifiedPlot
         plot.grid
       end
     end
+    return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.fieldPlot(inputs)
     RubyPython.start
