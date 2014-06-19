@@ -114,10 +114,10 @@ class TestPlotter < Minitest::Test
       :title => 'sin',
 
     }]
-    UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out left'})
-    UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out right bottom'})
-    UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out center bottom'})
-    UnifiedPlot.linePlot(data,plotConf:  {:label_position => 'out center bottom horizontal'})
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out left'})
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out right bottom'})
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out center bottom'})
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out center bottom horizontal'})
   end
   def test_heat_map
     @data[:y] = @data[:x]
@@ -136,5 +136,17 @@ class TestPlotter < Minitest::Test
     topo      = Cdo.topo(options: '-f nc',returnMaArray: 'topo')
     topoOcean = Cdo.setrtomiss(0,100000,input: "-topo", options: '-f nc',returnMaArray: 'topo')
     UnifiedPlot.fieldPlot(topo)
+  end
+  def test_xlog
+    myData = []
+    @data[:y].each {|v|
+      myData << v*rand*Math.exp(rand(50))
+    }
+    data = {
+      :x => @data[:x],
+      :y => myData,
+    }
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out left'                   })
+    UnifiedPlot.linePlot(data,plotConf:  {:key => 'out left',:logscale => 'y'})
   end
 end

@@ -10,7 +10,7 @@ module UnifiedPlot
     :y2label => nil,
     :xlabel  => nil,
     :x2label => nil,
-    :label_position => 'bottom out',
+    :key => 'bottom out',
     :xsize => 1200,
     :ysize => 800,
     :font => 'arial',
@@ -48,22 +48,13 @@ module UnifiedPlot
           plot.output "#{oName}.#{oType}"
         end
 
-        plotConf = PLOT_DEFAULTS.merge(plotConf)
         plot.title   title
-        plot.key     plotConf[:label_position]
 
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+	UnifiedPlot.applyConf(plot,plotConf)
 
         plot.xtics
         plot.ytics
 
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
         inputs.each {|data|
           data = DATA_DEFAULTS.merge(data)
           dataset = data.has_key?(:x) ? [data[:x].to_a,data[:y].to_a] : data[:y].to_a
@@ -90,20 +81,11 @@ module UnifiedPlot
 
         plotConf = PLOT_DEFAULTS.merge(plotConf)
         plot.title   title
-        plot.key     plotConf[:label_position]
 
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+	UnifiedPlot.applyConf(plot,plotConf)
 
         plot.xtics
         plot.ytics
-
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
 
         # write stuff to a file
         filename = `tempfile`.chomp
@@ -124,6 +106,7 @@ module UnifiedPlot
     return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.heatMap(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+    plotConf = PLOT_DEFAULTS.merge(plotConf)
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
         unless 'x11' == oType
@@ -131,22 +114,13 @@ module UnifiedPlot
           plot.output "#{oName}.#{oType}"
         end
 
-        plotConf = PLOT_DEFAULTS.merge(plotConf)
         plot.title   title
-        plot.key     plotConf[:label_position]
 
-        plot.xrange  plotConf[:xrange]  unless plotConf[:xrange].nil?
-        plot.x2range plotConf[:x2range] unless plotConf[:x2range].nil?
-        plot.yrange  plotConf[:yrange]  unless plotConf[:yrange].nil?
-        plot.y2range plotConf[:y2range] unless plotConf[:y2range].nil?
+	UnifiedPlot.applyConf(plot,plotConf)
 
         plot.xtics
         plot.ytics
 
-        plot.xlabel  plotConf[:xlabel]
-        plot.x2label plotConf[:x2label]
-        plot.ylabel  plotConf[:ylabel]
-        plot.y2label plotConf[:y2label]
         inputs.each {|data|
           data = DATA_DEFAULTS.merge(data)
           dataset = [data[:x].to_a,data[:y].to_a,data[:z].to_a]
@@ -166,5 +140,17 @@ module UnifiedPlot
     pl = RubyPython.import('pylab')
     pl.imshow(inputs.to_a.reverse)
     pl.show()
+  end
+  private
+  def UnifiedPlot.applyConf(plot,config)
+    config.each {|k,v| 
+      # avoid image settings
+      next if [:font,:fontsize,:xsize,:ysize,:label_position].include?(k)
+      unless [true,false].include?(v) then
+	plot.send(k,v)
+      else
+	plot.send(k)
+      end
+    }
   end
 end
