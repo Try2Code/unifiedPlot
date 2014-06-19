@@ -149,4 +149,15 @@ class TestPlotter < Minitest::Test
     UnifiedPlot.linePlot(data,plotConf:  {:key => 'out left'                   })
     UnifiedPlot.linePlot(data,plotConf:  {:key => 'out left',:logscale => 'y'})
   end
+  def test_m
+    data = {:x=>
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], :y=>
+      [0.0, -215427956736.0, -205305561088.0, -196051189760.0, -187469692928.0, -179452936192.0, -171930812416.0, -164852547584.0, -158178361344.0, -151875371008.0, -145915314176.0, -140273369088.0, -134927319040.0, -129857044480.0, -125044203520.0, -120471986176.0, -116124925952.0, -111988744192.0, -108050259968.0, -104297291776.0, -100718526464.0, -97303511040.0, -94042546176.0, -90926612480.0, -62281179136.0],
+        :style=>"lines"}
+
+      UnifiedPlot.linePlot(data,oName: "test_m",oType: 'png',
+                           plotConf: {xsize: 300, ysize: 200})
+      assert_equal('PNG',`identify test_m.png | cut -d ' ' -f 2`.chomp)
+      assert_equal('300x200',`identify test_m.png | cut -d ' ' -f 3`.chomp)
+  end
 end
