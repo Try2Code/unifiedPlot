@@ -109,7 +109,7 @@ module UnifiedPlot
     end
     return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
-  def UnifiedPlot.heatMap(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+  def UnifiedPlot.heatMap(input,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
     plotConf = PLOT_DEFAULTS.merge(plotConf)
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
@@ -125,15 +125,13 @@ module UnifiedPlot
         plot.xtics
         plot.ytics
 
-        inputs.each {|data|
-          data = DATA_DEFAULTS.merge(data)
-          dataset = [data[:x].to_a,data[:y].to_a,data[:z].to_a]
-          plot.data << Gnuplot::DataSet.new( dataset ) do |ds|
-            ds.with  = 'image'
-            ds.axes  = data[:axes]
-            ds.title = data[:title]
-          end
-        }
+        data = DATA_DEFAULTS.merge(input)
+        dataset = [data[:x].to_a,data[:y].to_a,data[:z].to_a]
+        plot.data << Gnuplot::DataSet.new( dataset ) do |ds|
+          ds.with  = 'image'
+          ds.axes  = data[:axes]
+          ds.title = data[:title]
+        end
         plot.grid
       end
     end
