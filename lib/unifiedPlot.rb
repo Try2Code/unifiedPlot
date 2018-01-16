@@ -1,6 +1,7 @@
 require 'gnuplot'
 require 'rubypython'
 require 'fileutils'
+require 'tempfile'
 
 module UnifiedPlot
 
@@ -72,6 +73,7 @@ module UnifiedPlot
     return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.pm3d(inputs,plotConf: PLOT_DEFAULTS,title: '',oType: 'x11',oName: 'test')
+    tfs = []
     Gnuplot.open do |gp|
       Gnuplot::SPlot.new( gp ) do |plot|
         unless 'x11' == oType
@@ -88,7 +90,9 @@ module UnifiedPlot
         plot.ytics
 
         # write stuff to a file
-        filename = `tempfile`.chomp
+        tf = Tempfile.new('unifiedPlot')
+        tfs << tf
+        filename = tf.path
         File.open(filename,'w') {|f|
           inputs.each {|data|
             f << data.join(' ')

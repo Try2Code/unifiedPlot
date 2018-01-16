@@ -2,7 +2,6 @@ $:.unshift File.join(File.dirname(__FILE__),"..","lib")
 require 'minitest/autorun'
 require "unifiedPlot"
 require 'narray'
-require 'gsl'
 require 'cdo'
 require 'pp'
 
@@ -30,11 +29,11 @@ class TestPlotter < Minitest::Test
         :x => x,
         :y => y,
       }
-    when 'gsl' then
-      {
-        :x => GSL::Vector[*x],
-        :y => GSL::Vector[*y],
-      }
+#    when 'gsl' then
+#     {
+#       :x => GSL::Vector[*x],
+#       :y => GSL::Vector[*y],
+#     }
     end
   end
   def mathOp(op,input)
@@ -126,9 +125,10 @@ class TestPlotter < Minitest::Test
 
     10.times { inputs << (rand*@data[:z] + rand + rand).to_a }
 
-    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map')
+    UnifiedPlot.pm3d(inputs,plotConf: {:key => 'out bot',:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map')
     oName='test_heat_map'
-    UnifiedPlot.pm3d(inputs,plotConf: {:xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map',oType: 'png',oName: oName)
+    UnifiedPlot.pm3d(inputs,plotConf: {:key => 'out bot', 
+                                       :xrange => '[-0.5:9.5]',:yrange => '[-0.5:9.5]'},title: 'test_heat_map',oType: 'png',oName: oName)
     showImage("#{oName}.png")
   end
 
