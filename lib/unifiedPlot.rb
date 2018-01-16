@@ -114,7 +114,7 @@ module UnifiedPlot
     Gnuplot.open do |gp|
       Gnuplot::Plot.new( gp ) do |plot|
         unless 'x11' == oType
-          plot.terminal oType
+          plot.terminal "#{oType} size #{plotConf[:xsize]},#{plotConf[:ysize]} font #{plotConf[:font]} #{plotConf[:fontsize]}"
           plot.output "#{oName}.#{oType}"
         end
 
