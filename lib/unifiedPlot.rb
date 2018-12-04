@@ -1,5 +1,4 @@
 require 'gnuplot'
-require 'rubypython'
 require 'fileutils'
 require 'tempfile'
 
@@ -138,6 +137,7 @@ module UnifiedPlot
     return ('x11' != oType) ? [oName,oType].join('.') : nil
   end
   def UnifiedPlot.fieldPlot(inputs)
+    require 'rubypython'
     RubyPython.start
     pl = RubyPython.import('pylab')
     pl.imshow(inputs.to_a.reverse)
