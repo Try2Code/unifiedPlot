@@ -1,6 +1,6 @@
 require 'rubygems'
 
-GEM_SPEC = Gem::Specification.new do |s|
+spec = Gem::Specification.new do |s|
   s.name              = "unifiedPlot"
   s.version           = '0.0.6'
   s.date              = Time.new.strftime("%Y-%m-%d")
@@ -15,9 +15,12 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.author            = "Ralf Mueller"
   s.email             = "stark.dreamdetective@gmail.com"
   s.homepage          = "https://github.com/Try2Code/unifiedPlot"
-  s.licenses          = ['BSD']
+  s.licenses          = '0BSD'
 
   s.has_rdoc          = false
+  s.required_ruby_version = ">= 1.9"
+  s.add_development_dependency 'gnuplot', '~> 0'
+  s.add_development_dependency 'narray', '~> 0'
 end
 
 # vim:ft=ruby
