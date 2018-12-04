@@ -133,9 +133,9 @@ class TestPlotter < Minitest::Test
   end
 
   def test_field_plot
-    Cdo.debug = true
-    topo      = Cdo.topo(options: '-f nc',returnMaArray: 'topo')
-    topoOcean = Cdo.setrtomiss(0,100000,input: "-topo", options: '-f nc',returnMaArray: 'topo')
+    cdo       = Cdo.new(debug: true)
+    topo      = cdo.topo(options: '-f nc',returnMaArray: 'topo')
+    topoOcean = cdo.setrtomiss(0,100000,input: "-topo", options: '-f nc',returnMaArray: 'topo')
     UnifiedPlot.fieldPlot(topo)
   end
   def test_xlog

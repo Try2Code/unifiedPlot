@@ -5,7 +5,7 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.version           = '0.0.6'
   s.date              = Time.new.strftime("%Y-%m-%d")
 
-  s.description       = 'single interface to line-plotting data in [],NArray and GSL::Vector format'
+  s.description       = 'single interface to line-plotting data in [] or NArray'
   s.summary           = 'simple line plot for array-based inputs'
 
   s.platform          = Gem::Platform::RUBY
